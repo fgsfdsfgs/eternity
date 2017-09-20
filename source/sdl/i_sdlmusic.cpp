@@ -178,7 +178,7 @@ int adlmidi_bank     = 172;
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
-   adl_play(adl_midiplayer, int(len / STEP), reinterpret_cast<Sint16 *>(stream));
+   adl_play(adl_midiplayer, int(len / ADLMIDISTEP), reinterpret_cast<Sint16 *>(stream));
 }
 
 #endif
@@ -341,7 +341,7 @@ static void I_SDLSetMusicVolume(int volume)
 #ifdef HAVE_ADLMIDILIB
    if(adl_midiplayer)
    {
-      // FIXME: This
+      // TODO: libADLMIDI can't set volume/gain currently
    }
 #endif
 }
