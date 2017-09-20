@@ -174,11 +174,24 @@ int adlmidi_bank     = 172;
 
 //
 // Play a MIDI via libADLMIDI
-// TODO: Surely there must be more here than just a single line?
+// Thanks to Wohlstand for the volume control code!
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
-   adl_play(adl_midiplayer, int(len / ADLMIDISTEP), reinterpret_cast<Sint16 *>(stream));
+   const int numsamples = len / ADLMIDISTEP;
+   const double volumeFactor = (snd_MusicVolume / 15.0);
+
+   Sint16 *outbuff = reinterpret_cast<Sint16 *>(stream);
+   Sint16 *buff_p, *buff_end;
+
+   const size_t got = adl_play(adl_midiplayer, numsamples, outbuff);
+   buff_p = outbuff;
+   buff_end = outbuff + got;
+   while(buff_p < buff_end)
+   {
+      *buff_p = Sint16(double(*buff_p) * volumeFactor);
+      buff_p++;
+   }
 }
 
 #endif
