@@ -337,6 +337,13 @@ static void I_SDLSetMusicVolume(int volume)
       spc_filter_set_gain(spc_filter, volume * (256 * spc_preamp) / 15);
    }
 #endif
+
+#ifdef HAVE_ADLMIDILIB
+   if(adl_midiplayer)
+   {
+      // FIXME: This
+   }
+#endif
 }
 
 static int paused_midi_volume;
@@ -411,6 +418,11 @@ static void I_SDLStopSong(int handle)
    if(snes_spc)
       Mix_HookMusic(NULL, NULL);
 #endif
+
+#ifdef HAVE_ADLMIDILIB
+   if(adl_midiplayer)
+      Mix_HookMusic(nullptr, nullptr);
+#endif
 }
 
 //
@@ -456,6 +468,15 @@ static void I_SDLUnRegisterSong(int handle)
 
       snes_spc   = NULL;
       spc_filter = NULL;
+   }
+#endif
+
+#ifdef HAVE_ADLMIDILIB
+   if(adl_midiplayer)
+   {
+      Mix_HookMusic(nullptr, nullptr);
+      adl_close(adl_midiplayer);
+      adl_midiplayer = nullptr;
    }
 #endif
 }
@@ -583,6 +604,7 @@ static int I_SDLRegisterSong(void *data, int size)
       adl_midiplayer = adl_init(44100);
       if(adl_openData(adl_midiplayer, data, size) == 0)
       {
+         adl_setVolumeRangeModel(adl_midiplayer, ADLMIDI_VolumeModel_DMX);
          adl_setNumCards(adl_midiplayer, adlmidi_numcards);
          adl_setBank(adl_midiplayer, adlmidi_bank);
          return 1;
@@ -618,11 +640,14 @@ static int I_SDLQrySongPlaying(int handle)
    // haleyjd: this is never called
    // julian: and is that a reason not to code it?!?
    // haleyjd: ::shrugs::
-#ifdef HAVE_SPCLIB
-   return CHECK_MUSIC(handle) || snes_spc != NULL;
-#else
-   return CHECK_MUSIC(handle);
+   return
+#ifdef HAVE_ADLMIDILIB
+   adl_midiplayer != nullptr ||
 #endif
+#ifdef HAVE_SPCLIB
+   snes_spc != nullptr ||
+#endif
+   CHECK_MUSIC(handle);
 }
 
 i_musicdriver_t i_sdlmusicdriver =
