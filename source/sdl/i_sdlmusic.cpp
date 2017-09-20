@@ -162,37 +162,23 @@ static void I_EffectSPC(void *udata, Uint8 *stream, int len)
 }
 #endif
 
-#define STEP sizeof(short)
-#define STEPSHIFT 1
+#define ADLMIDISTEP sizeof(short)
+#define ADLMIDISTEPSHIFT 1
 
 #ifdef HAVE_ADLMIDILIB
-ADL_MIDIPlayer *adl_midiplayer;
+ADL_MIDIPlayer *adl_midiplayer = nullptr;
+
+int midi_device      = 0;
+int adlmidi_numcards = 2;
+int adlmidi_bank     = 172;
 
 //
-// TODO: This
+// Play a MIDI via libADLMIDI
+// TODO: Surely there must be more here than just a single line?
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
-   Sint16 *leftout, *rightout, *leftend, *datal, *datar;
-   int numsamples, spcsamples;
-   int stepremainder = 0, i = 0;
-   int dl, dr;
-
-   static short *adlmidi_buffer = nullptr;
-   static int lastadlmidibuffers = 0;
-
-   leftout = reinterpret_cast<Sint16 *>(stream);
-   rightout = reinterpret_cast<Sint16 *>(stream) + 1;
-
-   numsamples = len / STEP;
-   leftend = leftout + numsamples;
-
-   // round samples up to higher even number
-
-   // FIXME: Put these lines in some form somewhere, not together though
-   // adl_midiplayer = adl_init(49716);
-   // adl_openData(adl_midiplayer, data, size);
-
+   adl_play(adl_midiplayer, int(len / STEP), reinterpret_cast<Sint16 *>(stream));
 }
 
 #endif
@@ -305,6 +291,9 @@ static int I_SDLInitMusic(void)
 //
 static void I_SDLPlaySong(int handle, int looping)
 {
+   Mix_HookMusic(I_EffectADLMIDI, nullptr);
+   return;
+
 #ifdef HAVE_SPCLIB
    // if a SPC is set up, play it.
    if(snes_spc)
@@ -566,6 +555,11 @@ static int I_SDLRegisterSong(void *data, int size)
       size   = midlen;
       isMIDI = true;   // now it's a MIDI.
    }
+
+   adl_midiplayer = adl_init(44100);
+   adl_openData(adl_midiplayer, data, size);
+   adl_setBank(adl_midiplayer, 72);
+   return 1;
    
 #ifdef EE_FEATURE_MIDIRPC
    // Check for option to invoke RPC server if isMIDI

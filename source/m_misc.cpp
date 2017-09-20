@@ -64,6 +64,7 @@
 #include "r_sky.h"
 #include "r_things.h"
 #include "s_sound.h"
+#include "src/adldata.hh"
 #include "st_stuff.h"
 #include "v_video.h"
 
@@ -98,6 +99,14 @@ extern int  endoomdelay;
 #ifdef HAVE_SPCLIB
 extern int spc_preamp;
 extern int spc_bass_boost;
+#endif
+
+#ifdef HAVE_ADLMIDILIB
+extern int midi_device;
+extern int adlmidi_numcards;
+extern int adlmidi_bank;
+
+const int BANKS_MAX = (maxAdlBanks() - 1);
 #endif
 
 // haleyjd 10/09/07: wipe waiting
@@ -829,6 +838,17 @@ default_t defaults[] =
    DEFAULT_INT("snd_spcbassboost", &spc_bass_boost, NULL, 8, 1, 31, default_t::wad_yes,
                "bass boost for SPC music (logarithmic scale, 8 = normal)"),
    
+#endif
+
+#ifdef HAVE_ADLMIDILIB
+   DEFAULT_INT("snd_mididevice", &midi_device, NULL, -1, -1, 0, default_t::wad_yes,
+               "TODO: midi_device description"),
+
+   DEFAULT_INT("snd_numcards", &adlmidi_numcards, NULL, 2, 1, 100, default_t::wad_yes,
+               "TODO: adlmidi_numcards description"),
+
+   DEFAULT_INT("snd_bank", &adlmidi_bank, NULL, 72, 0, BANKS_MAX, default_t::wad_yes,
+               "TODO: adlmidi_bank description"),
 #endif
 
    // last entry

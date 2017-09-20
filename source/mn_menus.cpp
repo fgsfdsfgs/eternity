@@ -2260,8 +2260,12 @@ static menuitem_t mn_sound_items[] =
    {it_info,       "Setup"},
    {it_toggle,     "Sound driver",                 "snd_card"},
    {it_toggle,     "Music driver",                 "mus_card"},
+   {it_toggle,     "Midi device",                  "snd_mididevice" },
    {it_toggle,     "Max sound channels",           "snd_channels"},
    {it_toggle,     "Force reverse stereo",         "s_flippan"},
+   {it_toggle,     "OPL3 Chip Count",              "snd_numcards" },
+   {it_toggle,     "OPL3 Bank",                    "snd_bank" },
+
    {it_gap},
    {it_info,       "Misc"},
    {it_toggle,     "Precache sounds",              "s_precache"},
