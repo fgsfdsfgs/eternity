@@ -64,7 +64,7 @@
 #include "r_sky.h"
 #include "r_things.h"
 #include "s_sound.h"
-#include "src/adldata.hh"
+#include "src/adlmidi.h"
 #include "st_stuff.h"
 #include "v_video.h"
 
@@ -106,7 +106,7 @@ extern int midi_device;
 extern int adlmidi_numcards;
 extern int adlmidi_bank;
 
-const int BANKS_MAX = (maxAdlBanks() - 1);
+const int BANKS_MAX = (adl_getBanksCount() - 1);
 #endif
 
 // haleyjd 10/09/07: wipe waiting

@@ -291,13 +291,18 @@ static int I_SDLInitMusic(void)
 //
 static void I_SDLPlaySong(int handle, int looping)
 {
-   Mix_HookMusic(I_EffectADLMIDI, nullptr);
-   return;
-
 #ifdef HAVE_SPCLIB
    // if a SPC is set up, play it.
    if(snes_spc)
       Mix_HookMusic(I_EffectSPC, NULL);
+   else
+#endif
+#ifdef HAVE_ADLMIDILIB
+   if(adl_midiplayer)
+   {
+      Mix_HookMusic(I_EffectADLMIDI, nullptr);
+      adl_setLoopEnabled(adl_midiplayer, looping);
+   }
    else
 #endif
 #ifdef EE_FEATURE_MIDIRPC
@@ -556,14 +561,9 @@ static int I_SDLRegisterSong(void *data, int size)
       isMIDI = true;   // now it's a MIDI.
    }
 
-   adl_midiplayer = adl_init(44100);
-   adl_openData(adl_midiplayer, data, size);
-   adl_setBank(adl_midiplayer, 72);
-   return 1;
-   
 #ifdef EE_FEATURE_MIDIRPC
    // Check for option to invoke RPC server if isMIDI
-   if(isMIDI && haveMidiServer)
+   if(isMIDI && haveMidiServer && midi_device == -1)
    {
       // Init client if not yet started
       if(!haveMidiClient)
@@ -574,6 +574,21 @@ static int I_SDLRegisterSong(void *data, int size)
          serverMidiPlaying = true;
          return 1; // server will play this song.
       }
+   }
+#endif
+
+#ifdef HAVE_ADLMIDILIB
+   if(isMIDI && haveMidiServer && midi_device == 0)
+   {
+      adl_midiplayer = adl_init(44100);
+      if(adl_openData(adl_midiplayer, data, size) == 0)
+      {
+         adl_setNumCards(adl_midiplayer, adlmidi_numcards);
+         adl_setBank(adl_midiplayer, adlmidi_bank);
+         return 1;
+      }
+      adl_close(adl_midiplayer);
+      adl_midiplayer = nullptr;
    }
 #endif
 
