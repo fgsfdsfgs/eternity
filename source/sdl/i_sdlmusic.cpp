@@ -53,6 +53,10 @@
 #include "../../snes_spc/spc.h"
 #endif
 
+#ifdef HAVE_ADLMIDILIB
+#include "src/adlmidi.h"
+#endif
+
 extern int audio_buffers;
 
 #define STEP sizeof(Sint16)
@@ -156,6 +160,41 @@ static void I_EffectSPC(void *udata, Uint8 *stream, int len)
       rightout += STEP;
    }
 }
+#endif
+
+#define STEP sizeof(short)
+#define STEPSHIFT 1
+
+#ifdef HAVE_ADLMIDILIB
+ADL_MIDIPlayer *adl_midiplayer;
+
+//
+// TODO: This
+//
+static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
+{
+   Sint16 *leftout, *rightout, *leftend, *datal, *datar;
+   int numsamples, spcsamples;
+   int stepremainder = 0, i = 0;
+   int dl, dr;
+
+   static short *adlmidi_buffer = nullptr;
+   static int lastadlmidibuffers = 0;
+
+   leftout = reinterpret_cast<Sint16 *>(stream);
+   rightout = reinterpret_cast<Sint16 *>(stream) + 1;
+
+   numsamples = len / STEP;
+   leftend = leftout + numsamples;
+
+   // round samples up to higher even number
+
+   // FIXME: Put these lines in some form somewhere, not together though
+   // adl_midiplayer = adl_init(49716);
+   // adl_openData(adl_midiplayer, data, size);
+
+}
+
 #endif
 
 //
