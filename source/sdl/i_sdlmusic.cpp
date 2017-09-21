@@ -166,7 +166,8 @@ static void I_EffectSPC(void *udata, Uint8 *stream, int len)
 #define ADLMIDISTEPSHIFT 1
 
 #ifdef HAVE_ADLMIDILIB
-ADL_MIDIPlayer *adl_midiplayer = nullptr;
+static ADL_MIDIPlayer *adl_midiplayer = nullptr;
+static SDL_AudioCVT cvt;
 
 int midi_device      = 0;
 int adlmidi_numcards = 2;
@@ -176,15 +177,36 @@ int adlmidi_bank     = 172;
 // Play a MIDI via libADLMIDI
 // Thanks to Wohlstand for the volume control code!
 // FIXME: Sometimes when closing down, this just crashes.
+// FIXME: adlmidi_numcards > 2 causes playback issues
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
-   const int numsamples = len / ADLMIDISTEP;
+   int srgArraySize, srcLen, gottenLen, dest_len;
+   short* buf;
 
-   Sint16 *outbuff = ecalloc(Sint16 *, len, sizeof(Sint16));
-   adl_play(adl_midiplayer, numsamples, outbuff);
-   SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), len, (snd_MusicVolume * 128) / 15);
-   efree(outbuff);
+   srgArraySize = len * cvt.len_mult;
+   buf = emalloc(short *, srgArraySize);
+   srcLen = int(double(len / 2.0) / cvt.len_ratio);
+
+   gottenLen = adl_play(adl_midiplayer, srcLen, buf);
+
+   dest_len = gottenLen * 2;
+
+   if(cvt.needed)
+   {
+      cvt.len = dest_len;
+      cvt.buf = reinterpret_cast<Uint8 *>(buf);
+      SDL_ConvertAudio(&cvt);
+      dest_len = cvt.len_cvt;
+   }
+
+   if(snd_MusicVolume == 15)
+      memcpy(stream, reinterpret_cast<Uint8 *>(buf), size_t(dest_len));
+   else
+      SDL_MixAudio(stream, reinterpret_cast<Uint8*>(buf),
+                   Uint32(dest_len), (128 * snd_MusicVolume) / 15);
+
+   efree(buf);
 }
 
 #endif
@@ -604,6 +626,7 @@ static int I_SDLRegisterSong(void *data, int size)
       adl_setVolumeRangeModel(adl_midiplayer, ADLMIDI_VolumeModel_DMX);
       adl_setNumCards(adl_midiplayer, adlmidi_numcards);
       adl_setBank(adl_midiplayer, adlmidi_bank);
+      SDL_BuildAudioCVT(&cvt, AUDIO_S16, 2, 44100, MIX_DEFAULT_FORMAT, 2, 44100);
       if(adl_openData(adl_midiplayer, data, size) == 0)
          return 1;
       // Opening data went wrong
