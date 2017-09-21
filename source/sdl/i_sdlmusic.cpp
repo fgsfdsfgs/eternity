@@ -620,7 +620,7 @@ static int I_SDLRegisterSong(void *data, int size)
 #endif
 
 #ifdef HAVE_ADLMIDILIB
-   if(isMIDI && haveMidiServer && midi_device == 0)
+   if(isMIDI && midi_device == 0)
    {
       adl_midiplayer = adl_init(44100);
       adl_setVolumeRangeModel(adl_midiplayer, ADLMIDI_VolumeModel_DMX);
