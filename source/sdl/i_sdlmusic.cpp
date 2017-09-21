@@ -178,6 +178,11 @@ int adlmidi_bank     = 172;
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
+   // FIXME: This shouldn't be necessary but it stops a crash from occurring
+   // Find out why.
+   if(!adl_midiplayer)
+      return;
+
    const int numsamples = len / ADLMIDISTEP;
    const double volumeFactor = (snd_MusicVolume / 15.0);
 
@@ -488,6 +493,7 @@ static void I_SDLUnRegisterSong(int handle)
    if(adl_midiplayer)
    {
       Mix_HookMusic(nullptr, nullptr);
+      adl_reset(adl_midiplayer);
       adl_close(adl_midiplayer);
       adl_midiplayer = nullptr;
    }
