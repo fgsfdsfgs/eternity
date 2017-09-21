@@ -615,13 +615,12 @@ static int I_SDLRegisterSong(void *data, int size)
    if(isMIDI && haveMidiServer && midi_device == 0)
    {
       adl_midiplayer = adl_init(44100);
+      adl_setVolumeRangeModel(adl_midiplayer, ADLMIDI_VolumeModel_DMX);
+      adl_setNumCards(adl_midiplayer, adlmidi_numcards);
+      adl_setBank(adl_midiplayer, adlmidi_bank);
       if(adl_openData(adl_midiplayer, data, size) == 0)
-      {
-         adl_setVolumeRangeModel(adl_midiplayer, ADLMIDI_VolumeModel_DMX);
-         adl_setNumCards(adl_midiplayer, adlmidi_numcards);
-         adl_setBank(adl_midiplayer, adlmidi_bank);
          return 1;
-      }
+      // Opening data went wrong
       adl_close(adl_midiplayer);
       adl_midiplayer = nullptr;
    }
