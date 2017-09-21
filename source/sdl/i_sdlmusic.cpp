@@ -175,29 +175,16 @@ int adlmidi_bank     = 172;
 //
 // Play a MIDI via libADLMIDI
 // Thanks to Wohlstand for the volume control code!
+// FIXME: Sometimes when closing down, this just crashes.
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
-   // FIXME: Sometimes when closing down, this just crashes.
-
    const int numsamples = len / ADLMIDISTEP;
 
-   Sint16 *outbuff = reinterpret_cast<Sint16 *>(stream);
-
-   const size_t got = adl_play(adl_midiplayer, numsamples, outbuff);
-   if(snd_MusicVolume != 15)
-   {
-      const double volumeFactor = (snd_MusicVolume / 15.0);
-      Sint16 *buff_p, *buff_end;
-
-      buff_p = outbuff;
-      buff_end = outbuff + got;
-      while(buff_p < buff_end)
-      {
-         *buff_p = Sint16(double(*buff_p) * volumeFactor);
-         buff_p++;
-      }
-   }
+   Sint16 *outbuff = ecalloc(Sint16 *, len, sizeof(Sint16));
+   adl_play(adl_midiplayer, numsamples, outbuff);
+   SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), len, (snd_MusicVolume * 128) / 15);
+   efree(outbuff);
 }
 
 #endif
@@ -487,7 +474,6 @@ static void I_SDLUnRegisterSong(int handle)
    if(adl_midiplayer)
    {
       Mix_HookMusic(nullptr, nullptr);
-      adl_reset(adl_midiplayer);
       adl_close(adl_midiplayer);
       adl_midiplayer = nullptr;
    }
