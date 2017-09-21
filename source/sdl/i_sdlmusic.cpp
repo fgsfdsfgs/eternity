@@ -178,24 +178,25 @@ int adlmidi_bank     = 172;
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
-   // FIXME: This shouldn't be necessary but it stops a crash from occurring
-   // Find out why.
-   if(!adl_midiplayer)
-      return;
+   // FIXME: Sometimes when closing down, this just crashes.
 
    const int numsamples = len / ADLMIDISTEP;
-   const double volumeFactor = (snd_MusicVolume / 15.0);
 
    Sint16 *outbuff = reinterpret_cast<Sint16 *>(stream);
-   Sint16 *buff_p, *buff_end;
 
    const size_t got = adl_play(adl_midiplayer, numsamples, outbuff);
-   buff_p = outbuff;
-   buff_end = outbuff + got;
-   while(buff_p < buff_end)
+   if(snd_MusicVolume != 15)
    {
-      *buff_p = Sint16(double(*buff_p) * volumeFactor);
-      buff_p++;
+      const double volumeFactor = (snd_MusicVolume / 15.0);
+      Sint16 *buff_p, *buff_end;
+
+      buff_p = outbuff;
+      buff_end = outbuff + got;
+      while(buff_p < buff_end)
+      {
+         *buff_p = Sint16(double(*buff_p) * volumeFactor);
+         buff_p++;
+      }
    }
 }
 
@@ -353,13 +354,6 @@ static void I_SDLSetMusicVolume(int volume)
    {
       // if a SPC is playing, set its volume too
       spc_filter_set_gain(spc_filter, volume * (256 * spc_preamp) / 15);
-   }
-#endif
-
-#ifdef HAVE_ADLMIDILIB
-   if(adl_midiplayer)
-   {
-      // TODO: libADLMIDI can't set volume/gain currently
    }
 #endif
 }
