@@ -456,6 +456,11 @@ CONSOLE_VARIABLE(snd_spcbassboost, spc_bass_boost, 0)
 CONSOLE_VARIABLE(snd_mididevice, midi_device, 0) {}
 CONSOLE_VARIABLE(snd_numcards, adlmidi_numcards, 0) {}
 CONSOLE_VARIABLE(snd_bank, adlmidi_bank, 0) {}
+
+CONSOLE_COMMAND(snd_selectbank, 0)
+{
+   
+}
 #endif
 #endif
 

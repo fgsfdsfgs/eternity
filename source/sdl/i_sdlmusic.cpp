@@ -181,10 +181,15 @@ int adlmidi_bank     = 172;
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
    const int numsamples = len / ADLMIDISTEP;
-
    Sint16 *outbuff = ecalloc(Sint16 *, numsamples, sizeof(Sint16));
-   int outlen = adl_play(adl_midiplayer, numsamples, outbuff);
-   SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), outlen * ADLMIDISTEP, (snd_MusicVolume * 128) / 15);
+   int gotlen = adl_play(adl_midiplayer, numsamples, outbuff);
+   if(snd_MusicVolume == 15)
+      memcpy(stream, reinterpret_cast<Uint8 *>(outbuff), size_t(gotlen * 2));
+   else
+   {
+      SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), gotlen * ADLMIDISTEP,
+                   (snd_MusicVolume * 128) / 15);
+   }
    efree(outbuff);
 }
 
