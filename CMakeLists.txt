@@ -311,6 +311,7 @@ ENDIF (WIN32)
 ######################### Set Build Targets   ##################################
 
 INCLUDE_DIRECTORIES(acsvm)
+INCLUDE_DIRECTORIES(libADLMIDI)
 INCLUDE_DIRECTORIES(libpng)
 INCLUDE_DIRECTORIES(zlib)
 
@@ -320,6 +321,7 @@ ADD_SUBDIRECTORY(acsvm)
 
 ADD_SUBDIRECTORY(zlib)
 ADD_SUBDIRECTORY(libpng)
+ADD_SUBDIRECTORY(libADLMIDI)
 ADD_SUBDIRECTORY(snes_spc)
 ADD_SUBDIRECTORY(source)
 
