@@ -163,27 +163,32 @@ static void I_EffectSPC(void *udata, Uint8 *stream, int len)
 #endif
 
 #define ADLMIDISTEP sizeof(short)
-#define ADLMIDISTEPSHIFT 1
 
 #ifdef HAVE_ADLMIDILIB
-ADL_MIDIPlayer *adl_midiplayer = nullptr;
+static ADL_MIDIPlayer *adlmidi_player = nullptr;
 
 int midi_device      = 0;
-int adlmidi_numcards = 2;
+// TODO: Remove constexpr and uncomment all external instances of adlmidi_numcards,
+// and snd_numcards.
+constexpr int adlmidi_numcards = 2;
 int adlmidi_bank     = 172;
 
 //
 // Play a MIDI via libADLMIDI
-// Thanks to Wohlstand for the volume control code!
-// FIXME: Sometimes when closing down, this just crashes.
+// FIXME: adlmidi_numcards (adlmidi_player->NumCards) > 2 causes playback issues
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
    const int numsamples = len / ADLMIDISTEP;
-
-   Sint16 *outbuff = ecalloc(Sint16 *, len, sizeof(Sint16));
-   adl_play(adl_midiplayer, numsamples, outbuff);
-   SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), len, (snd_MusicVolume * 128) / 15);
+   Sint16 *outbuff = ecalloc(Sint16 *, numsamples, sizeof(Sint16));
+   int gotlen = adl_play(adlmidi_player, numsamples, outbuff);
+   if(snd_MusicVolume == 15)
+      memcpy(stream, reinterpret_cast<Uint8 *>(outbuff), size_t(gotlen * ADLMIDISTEP));
+   else
+   {
+      SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), gotlen * ADLMIDISTEP,
+                   (snd_MusicVolume * 128) / 15);
+   }
    efree(outbuff);
 }
 
@@ -304,10 +309,10 @@ static void I_SDLPlaySong(int handle, int looping)
    else
 #endif
 #ifdef HAVE_ADLMIDILIB
-   if(adl_midiplayer)
+   if(adlmidi_player)
    {
       Mix_HookMusic(I_EffectADLMIDI, nullptr);
-      adl_setLoopEnabled(adl_midiplayer, looping);
+      adl_setLoopEnabled(adlmidi_player, looping);
    }
    else
 #endif
@@ -419,7 +424,7 @@ static void I_SDLStopSong(int handle)
 #endif
 
 #ifdef HAVE_ADLMIDILIB
-   if(adl_midiplayer)
+   if(adlmidi_player)
       Mix_HookMusic(nullptr, nullptr);
 #endif
 }
@@ -434,6 +439,16 @@ static void I_SDLUnRegisterSong(int handle)
    {
       I_MidiRPCStopSong();
       serverMidiPlaying = false;
+   }
+#endif
+
+#ifdef HAVE_ADLMIDILIB
+   if(adlmidi_player)
+   {
+      adlmidi_player->QuitFlag = true;
+      Mix_HookMusic(nullptr, nullptr);
+      adl_close(adlmidi_player);
+      adlmidi_player = nullptr;
    }
 #endif
 
@@ -467,15 +482,6 @@ static void I_SDLUnRegisterSong(int handle)
 
       snes_spc   = NULL;
       spc_filter = NULL;
-   }
-#endif
-
-#ifdef HAVE_ADLMIDILIB
-   if(adl_midiplayer)
-   {
-      Mix_HookMusic(nullptr, nullptr);
-      adl_close(adl_midiplayer);
-      adl_midiplayer = nullptr;
    }
 #endif
 }
@@ -598,17 +604,16 @@ static int I_SDLRegisterSong(void *data, int size)
 #endif
 
 #ifdef HAVE_ADLMIDILIB
-   if(isMIDI && haveMidiServer && midi_device == 0)
+   if(isMIDI && midi_device == 0)
    {
-      adl_midiplayer = adl_init(44100);
-      adl_setVolumeRangeModel(adl_midiplayer, ADLMIDI_VolumeModel_DMX);
-      adl_setNumCards(adl_midiplayer, adlmidi_numcards);
-      adl_setBank(adl_midiplayer, adlmidi_bank);
-      if(adl_openData(adl_midiplayer, data, size) == 0)
+      adlmidi_player = adl_init(44100);
+      adl_setNumCards(adlmidi_player, adlmidi_numcards);
+      adl_setBank(adlmidi_player, adlmidi_bank);
+      if(adl_openData(adlmidi_player, data, long(size)) == 0)
          return 1;
       // Opening data went wrong
-      adl_close(adl_midiplayer);
-      adl_midiplayer = nullptr;
+      adl_close(adlmidi_player);
+      adlmidi_player = nullptr;
    }
 #endif
 
@@ -640,7 +645,7 @@ static int I_SDLQrySongPlaying(int handle)
    // haleyjd: ::shrugs::
    return
 #ifdef HAVE_ADLMIDILIB
-   adl_midiplayer != nullptr ||
+   adlmidi_player != nullptr ||
 #endif
 #ifdef HAVE_SPCLIB
    snes_spc != nullptr ||
