@@ -163,7 +163,6 @@ static void I_EffectSPC(void *udata, Uint8 *stream, int len)
 #endif
 
 #define ADLMIDISTEP sizeof(short)
-#define ADLMIDISTEPSHIFT 1
 
 #ifdef HAVE_ADLMIDILIB
 static ADL_MIDIPlayer *adl_midiplayer = nullptr;
@@ -184,7 +183,7 @@ static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
    Sint16 *outbuff = ecalloc(Sint16 *, numsamples, sizeof(Sint16));
    int gotlen = adl_play(adl_midiplayer, numsamples, outbuff);
    if(snd_MusicVolume == 15)
-      memcpy(stream, reinterpret_cast<Uint8 *>(outbuff), size_t(gotlen * 2));
+      memcpy(stream, reinterpret_cast<Uint8 *>(outbuff), size_t(gotlen * ADLMIDISTEP));
    else
    {
       SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), gotlen * ADLMIDISTEP,
