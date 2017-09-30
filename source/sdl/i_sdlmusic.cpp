@@ -173,8 +173,6 @@ int adlmidi_bank     = 172;
 
 //
 // Play a MIDI via libADLMIDI
-// Thanks to Wohlstand for the volume control code!
-// FIXME: Sometimes when closing down, this just crashes.
 // FIXME: adlmidi_numcards > 2 causes playback issues
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
@@ -442,6 +440,16 @@ static void I_SDLUnRegisterSong(int handle)
    }
 #endif
 
+#ifdef HAVE_ADLMIDILIB
+   if(adlmidi_player)
+   {
+      adlmidi_player->QuitFlag = true;
+      Mix_HookMusic(nullptr, nullptr);
+      adl_close(adlmidi_player);
+      adlmidi_player = nullptr;
+   }
+#endif
+
    if(CHECK_MUSIC(handle))
    {   
       // Stop and free song
@@ -472,15 +480,6 @@ static void I_SDLUnRegisterSong(int handle)
 
       snes_spc   = NULL;
       spc_filter = NULL;
-   }
-#endif
-
-#ifdef HAVE_ADLMIDILIB
-   if(adlmidi_player)
-   {
-      Mix_HookMusic(nullptr, nullptr);
-      adl_close(adlmidi_player);
-      adlmidi_player = nullptr;
    }
 #endif
 }
