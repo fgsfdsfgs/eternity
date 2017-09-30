@@ -168,12 +168,14 @@ static void I_EffectSPC(void *udata, Uint8 *stream, int len)
 static ADL_MIDIPlayer *adlmidi_player = nullptr;
 
 int midi_device      = 0;
-int adlmidi_numcards = 2;
+// TODO: Remove constexpr and uncomment all external instances of adlmidi_numcards,
+// and snd_numcards.
+constexpr int adlmidi_numcards = 2;
 int adlmidi_bank     = 172;
 
 //
 // Play a MIDI via libADLMIDI
-// FIXME: adlmidi_numcards > 2 causes playback issues
+// FIXME: adlmidi_numcards (adlmidi_player->NumCards) > 2 causes playback issues
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {

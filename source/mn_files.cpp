@@ -55,7 +55,6 @@
 #include "mn_misc.h"
 #include "r_data.h"
 #include "s_sound.h"
-#include "src/adlmidi.h"
 #include "v_font.h"
 #include "v_block.h"
 #include "v_misc.h"
@@ -63,6 +62,7 @@
 #include "w_wad.h"
 
 #ifdef HAVE_ADLMIDILIB
+#include "src/adlmidi.h"
 extern int adlmidi_bank;
 #endif
 

@@ -36,7 +36,10 @@
 #include "../m_misc.h"
 #include "../mn_engin.h"
 #include "../s_sound.h"
+
+#ifdef HAVE_ADLMIDILIB
 #include "src/adlmidi.h"
+#endif
 
 int snd_card;   // default.cfg variables for digi and midi drives
 int mus_card;   // jff 1/18/98
@@ -406,11 +409,11 @@ static const char *mididevicestr[] = { "Default", "ADLMIDI" };
 static const char **adlbankstr = const_cast<const char **>(adl_getBankNames());
 
 extern int midi_device;
-extern int adlmidi_numcards;
+//extern int adlmidi_numcards;
 extern int adlmidi_bank;
 
 VARIABLE_INT(midi_device, NULL, -1, 0, mididevicestr);
-VARIABLE_INT(adlmidi_numcards, NULL, 1, 100, NULL);
+//VARIABLE_INT(adlmidi_numcards, NULL, 1, 100, NULL);
 VARIABLE_INT(adlmidi_bank, NULL, 0, 72, adlbankstr);
 #endif
 
@@ -454,7 +457,7 @@ CONSOLE_VARIABLE(snd_spcbassboost, spc_bass_boost, 0)
 
 #ifdef HAVE_ADLMIDILIB
 CONSOLE_VARIABLE(snd_mididevice, midi_device, 0) {}
-CONSOLE_VARIABLE(snd_numcards, adlmidi_numcards, 0) {}
+//CONSOLE_VARIABLE(snd_numcards, adlmidi_numcards, 0) {}
 CONSOLE_VARIABLE(snd_bank, adlmidi_bank, 0) {}
 #endif
 #endif

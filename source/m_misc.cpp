@@ -64,9 +64,12 @@
 #include "r_sky.h"
 #include "r_things.h"
 #include "s_sound.h"
-#include "src/adlmidi.h"
 #include "st_stuff.h"
 #include "v_video.h"
+
+#ifdef HAVE_ADLMIDILIB
+#include "src/adlmidi.h"
+#endif
 
 //
 // DEFAULTS
@@ -103,7 +106,7 @@ extern int spc_bass_boost;
 
 #ifdef HAVE_ADLMIDILIB
 extern int midi_device;
-extern int adlmidi_numcards;
+//extern int adlmidi_numcards;
 extern int adlmidi_bank;
 
 const int BANKS_MAX = (adl_getBanksCount() - 1);
@@ -842,10 +845,10 @@ default_t defaults[] =
 
 #ifdef HAVE_ADLMIDILIB
    DEFAULT_INT("snd_mididevice", &midi_device, NULL, -1, -1, 0, default_t::wad_yes,
-               "TODO: midi_device description"),
+               "device used for MIDI playback"),
 
-   DEFAULT_INT("snd_numcards", &adlmidi_numcards, NULL, 2, 1, 100, default_t::wad_yes,
-               "TODO: adlmidi_numcards description"),
+   //DEFAULT_INT("snd_numcards", &adlmidi_numcards, NULL, 2, 1, 100, default_t::wad_yes,
+   //            "TODO: adlmidi_numcards description"),
 
    DEFAULT_INT("snd_bank", &adlmidi_bank, NULL, 72, 0, BANKS_MAX, default_t::wad_yes,
                "TODO: adlmidi_bank description"),
