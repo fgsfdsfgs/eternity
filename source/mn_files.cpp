@@ -854,7 +854,7 @@ CONSOLE_COMMAND(mn_selectflat, 0)
 #ifdef HAVE_ADLMIDILIB
 CONSOLE_COMMAND(snd_selectbank, 0)
 {
-   static const char* const* banknames = adl_getBankNames();
+   static const char *const *banknames = adl_getBankNames();
    int i;
    int curnum;
 

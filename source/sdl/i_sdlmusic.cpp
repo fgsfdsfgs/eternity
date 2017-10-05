@@ -169,7 +169,7 @@ static ADL_MIDIPlayer *adlmidi_player = nullptr;
 
 int midi_device      = 0;
 // TODO: Remove constexpr and uncomment all external instances of adlmidi_numcards,
-// and snd_numcards.
+// and snd_numcards. Only do so once playback with > 2 is correct.
 constexpr int adlmidi_numcards = 2;
 int adlmidi_bank     = 172;
 
@@ -181,7 +181,7 @@ static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
    const int numsamples = len / ADLMIDISTEP;
    Sint16 *outbuff = ecalloc(Sint16 *, numsamples, sizeof(Sint16));
-   int gotlen = adl_play(adlmidi_player, numsamples, outbuff);
+   const int gotlen = adl_play(adlmidi_player, numsamples, outbuff);
    if(snd_MusicVolume == 15)
       memcpy(stream, reinterpret_cast<Uint8 *>(outbuff), size_t(gotlen * ADLMIDISTEP));
    else
