@@ -180,7 +180,7 @@ int adlmidi_bank     = 172;
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
    const int numsamples = len / ADLMIDISTEP;
-   Sint16 *outbuff = ecalloc(Sint16 *, numsamples, sizeof(Sint16));
+   Sint16 *outbuff = reinterpret_cast<Sint16 *>(calloc(numsamples, sizeof(Sint16 *)));
    const int gotlen = adl_play(adlmidi_player, numsamples, outbuff);
    if(snd_MusicVolume == 15)
       memcpy(stream, reinterpret_cast<Uint8 *>(outbuff), size_t(gotlen * ADLMIDISTEP));
@@ -189,7 +189,7 @@ static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
       SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), gotlen * ADLMIDISTEP,
                    (snd_MusicVolume * 128) / 15);
    }
-   efree(outbuff);
+   free(outbuff);
 }
 
 #endif
@@ -589,7 +589,11 @@ static int I_SDLRegisterSong(void *data, int size)
 
 #ifdef EE_FEATURE_MIDIRPC
    // Check for option to invoke RPC server if isMIDI
+#ifdef HAVE_ADLMIDILIB
    if(isMIDI && haveMidiServer && midi_device == -1)
+#else
+   if(isMIDI && haveMidiServer)
+#endif
    {
       // Init client if not yet started
       if(!haveMidiClient)
