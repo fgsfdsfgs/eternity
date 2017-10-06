@@ -122,7 +122,7 @@ void I_Init()
 }
 
 
-bool exiting = false;
+volatile bool exiting = false;
 
 //
 // Sets the global "exiting" variable, then exits
@@ -131,6 +131,12 @@ bool exiting = false;
 void I_Exit(int code)
 {
    exiting = true;
+#ifdef HAVE_ADLMIDILIB
+   // can't exit until ADLMIDI is done playing
+   extern volatile bool adlplaying;
+   while(adlplaying)
+      i_haltimer.Sleep(1);
+#endif
    exit(code);
 }
 

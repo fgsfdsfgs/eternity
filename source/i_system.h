@@ -64,7 +64,7 @@ void I_StartTic();
 ticcmd_t* I_BaseTiccmd();
 
 
-extern bool exiting;
+extern volatile bool exiting;
 
 // Called instead of exit
 void I_Exit(int code);

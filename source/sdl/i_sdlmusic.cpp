@@ -166,6 +166,7 @@ static void I_EffectSPC(void *udata, Uint8 *stream, int len)
 
 #ifdef HAVE_ADLMIDILIB
 static ADL_MIDIPlayer *adlmidi_player = nullptr;
+volatile bool adlplaying = false;
 
 int midi_device      = 0;
 // TODO: Remove constexpr and uncomment all external instances of adlmidi_numcards,
@@ -183,6 +184,7 @@ static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
    if(exiting)
       return;
 
+   adlplaying = true;
    const int numsamples = len / ADLMIDISTEP;
    Sint16 *outbuff = reinterpret_cast<Sint16 *>(calloc(numsamples, sizeof(Sint16 *)));
    const int gotlen = adl_play(adlmidi_player, numsamples, outbuff);
@@ -193,6 +195,7 @@ static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
       SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), gotlen * ADLMIDISTEP,
                    (snd_MusicVolume * 128) / 15);
    }
+   adlplaying = false;
    free(outbuff);
 }
 
