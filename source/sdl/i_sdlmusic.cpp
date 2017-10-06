@@ -367,8 +367,8 @@ static void I_SDLPauseSong(int handle)
 
    if(CHECK_MUSIC(handle))
    {
-      // Not for mids
-      if(Mix_GetMusicType(music) != MUS_MID)
+      // Not for mids (MaxW: except libADLMIDI!)
+      if(Mix_GetMusicType(music) != MUS_MID || midi_device == 0)
          Mix_PauseMusic();
       else
       {
@@ -394,8 +394,8 @@ static void I_SDLResumeSong(int handle)
 
    if(CHECK_MUSIC(handle))
    {
-      // Not for mids
-      if(Mix_GetMusicType(music) != MUS_MID)
+      // Not for mids (MaxW: except libADLMIDI!)
+      if(Mix_GetMusicType(music) != MUS_MID || midi_device == 0)
          Mix_ResumeMusic();
       else
          Mix_VolumeMusic(paused_midi_volume);
