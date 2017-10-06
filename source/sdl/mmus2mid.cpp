@@ -837,7 +837,7 @@ int main(int argc,char **argv)
       printf("Usage: MMUS2MID musfile[.MUS]\n");
       printf("writes musfile.MID as output\n");
       printf("musfile may contain wildcards\n");
-      exit(1);
+      I_Exit(1);
    }
 
    for(i = 1; i < argc; i++)
@@ -862,7 +862,7 @@ int main(int argc,char **argv)
             {          
                printf("Error reading MUS file\n");
                efree(mus);
-               exit(1);
+               I_Exit(1);
             }
             fclose(musst);
          }
@@ -870,14 +870,14 @@ int main(int argc,char **argv)
          {
             printf("Out of memory\n");
             efree(mus);
-            exit(1);
+            I_Exit(1);
          }
          
          err = mmus2mid(mus,&mididata,89,1);
          if(err)
          {
             printf("Error converting MUS file to MIDI: %d\n",err);
-            exit(1);
+            I_Exit(1);
          }
          efree(mus);
          
@@ -891,7 +891,7 @@ int main(int argc,char **argv)
                printf("Error writing MIDI file\n");
                FreeTracks(&mididata);
                efree(mid);
-               exit(1);
+               I_Exit(1);
             }
             fclose(midst);
          }
@@ -900,13 +900,13 @@ int main(int argc,char **argv)
             printf("Can't open MIDI file for output: %s\n", midfile);
             FreeTracks(&mididata);
             efree(mid);
-            exit(1);
+            I_Exit(1);
          }
       }
       else
       {
          printf("Can't open MUS file for input: %s\n", midfile);
-         exit(1);
+         I_Exit(1);
       }
       
       printf("MUS file %s converted to MIDI file %s\n",musfile,midfile);

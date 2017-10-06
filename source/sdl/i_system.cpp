@@ -122,6 +122,18 @@ void I_Init()
 }
 
 
+bool exiting = false;
+
+//
+// Sets the global "exiting" variable, then exits
+// TODO: Remove every atexit usage and just put it all in here
+//
+void I_Exit(int code)
+{
+   exiting = true;
+   exit(code);
+}
+
 static char errmsg[2048];  // buffer of error message -- killough
 
 static int has_exited;

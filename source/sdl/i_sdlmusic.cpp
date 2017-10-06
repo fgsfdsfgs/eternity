@@ -179,6 +179,10 @@ int adlmidi_bank     = 172;
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
+   // TODO: Remove this once all atexit calls are erradicated
+   if(exiting)
+      return;
+
    const int numsamples = len / ADLMIDISTEP;
    Sint16 *outbuff = reinterpret_cast<Sint16 *>(calloc(numsamples, sizeof(Sint16 *)));
    const int gotlen = adl_play(adlmidi_player, numsamples, outbuff);

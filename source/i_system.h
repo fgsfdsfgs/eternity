@@ -63,6 +63,12 @@ void I_StartTic();
 
 ticcmd_t* I_BaseTiccmd();
 
+
+extern bool exiting;
+
+// Called instead of exit
+void I_Exit(int code);
+
 // atexit handler -- killough
 
 void I_Quit();
