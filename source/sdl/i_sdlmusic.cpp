@@ -180,11 +180,14 @@ int adlmidi_bank     = 172;
 //
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
+   adlplaying = true;
    // TODO: Remove this once all atexit calls are erradicated
    if(exiting)
+   {
+      adlplaying = false;
       return;
+   }
 
-   adlplaying = true;
    const int numsamples = len / ADLMIDISTEP;
    Sint16 *outbuff = reinterpret_cast<Sint16 *>(calloc(numsamples, sizeof(Sint16 *)));
    const int gotlen = adl_play(adlmidi_player, numsamples, outbuff);
@@ -195,8 +198,8 @@ static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
       SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), gotlen * ADLMIDISTEP,
                    (snd_MusicVolume * 128) / 15);
    }
-   adlplaying = false;
    free(outbuff);
+   adlplaying = false;
 }
 
 #endif

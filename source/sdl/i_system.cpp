@@ -212,7 +212,7 @@ void I_QuitFast()
 {
    puts("Eternity quit quickly.");
    speedyexit = true;
-   exit(0);
+   I_Exit(0);
 }
 
 //
@@ -249,7 +249,7 @@ void I_FatalError(int code, const char *error, ...)
       if(!has_exited)    // If it hasn't exited yet, exit now -- killough
       {
          has_exited = 1; // Prevent infinitely recursive exits -- killough
-         exit(-1);
+         I_Exit(-1);
       }
       else
          abort(); // double fault, must abort
@@ -279,7 +279,7 @@ void I_ExitWithMessage(const char *msg, ...)
    if(!has_exited)    // If it hasn't exited yet, exit now -- killough
    {
       has_exited = 1; // Prevent infinitely recursive exits -- killough
-      exit(0);
+      I_Exit(0);
    }
 }
 
@@ -305,7 +305,7 @@ void I_Error(const char *error, ...) // killough 3/20/98: add const
    if(!has_exited)    // If it hasn't exited yet, exit now -- killough
    {
       has_exited = 1; // Prevent infinitely recursive exits -- killough
-      exit(-1);
+      I_Exit(-1);
    }
    else
       I_FatalError(I_ERR_ABORT, "I_Error: double faulted\n");
@@ -328,7 +328,7 @@ void I_ErrorVA(const char *error, va_list args)
    if(!has_exited)
    {
       has_exited = 1;
-      exit(-1);
+      I_Exit(-1);
    }
    else
       I_FatalError(I_ERR_ABORT, "I_ErrorVA: double faulted\n");
