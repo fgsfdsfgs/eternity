@@ -181,15 +181,15 @@ int adlmidi_bank     = 172;
 static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
 {
    adlplaying = true;
-   // TODO: Remove this once all atexit calls are erradicated
-   if(exiting)
+   // TODO: Remove the exiting check once all atexit calls are erradicated
+   if(exiting || Mix_PausedMusic())
    {
       adlplaying = false;
       return;
    }
 
    const int numsamples = len / ADLMIDISTEP;
-   Sint16 *outbuff = reinterpret_cast<Sint16 *>(calloc(numsamples, sizeof(Sint16 *)));
+   Sint16 *outbuff = reinterpret_cast<Sint16 *>(ecalloc(Sint16 *, numsamples, sizeof(Sint16)));
    const int gotlen = adl_play(adlmidi_player, numsamples, outbuff);
    if(snd_MusicVolume == 15)
       memcpy(stream, reinterpret_cast<Uint8 *>(outbuff), size_t(gotlen * ADLMIDISTEP));
@@ -198,7 +198,7 @@ static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
       SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), gotlen * ADLMIDISTEP,
                    (snd_MusicVolume * 128) / 15);
    }
-   free(outbuff);
+   efree(outbuff);
    adlplaying = false;
 }
 
@@ -378,7 +378,11 @@ static void I_SDLPauseSong(int handle)
    if(CHECK_MUSIC(handle))
    {
       // Not for mids (MaxW: except libADLMIDI!)
+#ifdef HAVE_ADLMIDILIB
       if(Mix_GetMusicType(music) != MUS_MID || midi_device == 0)
+#else
+      if(Mix_GetMusicType(music) != MUS_MID)
+#endif
          Mix_PauseMusic();
       else
       {
@@ -617,6 +621,19 @@ static int I_SDLRegisterSong(void *data, int size)
    }
 #endif
 
+   // Try SDL_mixer locally
+   rw    = SDL_RWFromMem(data, size);
+   music = Mix_LoadMUS_RW(rw);
+
+#ifdef HAVE_SPCLIB
+   if(!music)
+   {
+      // Is it a SPC?
+      if(!(err = I_TryLoadSPC(data, size)))
+         return 1;
+   }
+#endif
+
 #ifdef HAVE_ADLMIDILIB
    if(isMIDI && midi_device == 0)
    {
@@ -628,19 +645,6 @@ static int I_SDLRegisterSong(void *data, int size)
       // Opening data went wrong
       adl_close(adlmidi_player);
       adlmidi_player = nullptr;
-   }
-#endif
-
-   // Try SDL_mixer locally
-   rw    = SDL_RWFromMem(data, size);
-   music = Mix_LoadMUS_RW(rw);
-
-#ifdef HAVE_SPCLIB
-   if(!music)
-   {
-      // Is it a SPC?
-      if(!(err = I_TryLoadSPC(data, size)))
-         return 1;
    }
 #endif
 
