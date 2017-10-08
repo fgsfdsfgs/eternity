@@ -189,7 +189,7 @@ static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
    }
 
    const int numsamples = len / ADLMIDISTEP;
-   Sint16 *outbuff = reinterpret_cast<Sint16 *>(ecalloc(Sint16 *, numsamples, sizeof(Sint16)));
+   Sint16 *outbuff = ecalloc(Sint16 *, numsamples, sizeof(Sint16));
    const int gotlen = adl_play(adlmidi_player, numsamples, outbuff);
    if(snd_MusicVolume == 15)
       memcpy(stream, reinterpret_cast<Uint8 *>(outbuff), size_t(gotlen * ADLMIDISTEP));
