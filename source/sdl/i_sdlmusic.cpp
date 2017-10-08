@@ -409,7 +409,11 @@ static void I_SDLResumeSong(int handle)
    if(CHECK_MUSIC(handle))
    {
       // Not for mids (MaxW: except libADLMIDI!)
+#ifdef HAVE_ADLMIDILIB
       if(Mix_GetMusicType(music) != MUS_MID || midi_device == 0)
+#else
+      if(Mix_GetMusicType(music) != MUS_MID)
+#endif
          Mix_ResumeMusic();
       else
          Mix_VolumeMusic(paused_midi_volume);
