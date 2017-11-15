@@ -68,7 +68,7 @@
 #include "v_video.h"
 
 #ifdef HAVE_ADLMIDILIB
-#include "src/adlmidi.h"
+#include "adlmidi.h"
 #endif
 
 //

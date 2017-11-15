@@ -79,16 +79,18 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\libADLMIDI\include</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\libADLMIDI\include</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -97,8 +99,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\libADLMIDI\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -111,24 +114,15 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\libADLMIDI\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\libADLMIDI\src\adldata.hh" />
-    <ClInclude Include="..\libADLMIDI\src\adlmidi.h" />
-    <ClInclude Include="..\libADLMIDI\src\adlmidi_mus2mid.h" />
-    <ClInclude Include="..\libADLMIDI\src\adlmidi_private.hpp" />
-    <ClInclude Include="..\libADLMIDI\src\adlmidi_xmi2mid.h" />
-    <ClInclude Include="..\libADLMIDI\src\dbopl.h" />
-    <ClInclude Include="..\libADLMIDI\src\fraction.h" />
-    <ClInclude Include="..\libADLMIDI\src\nukedopl3.h" />
-  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libADLMIDI\src\adldata.cpp" />
     <ClCompile Include="..\libADLMIDI\src\adlmidi.cpp" />
@@ -140,6 +134,17 @@
     <ClCompile Include="..\libADLMIDI\src\adlmidi_xmi2mid.c" />
     <ClCompile Include="..\libADLMIDI\src\dbopl.cpp" />
     <ClCompile Include="..\libADLMIDI\src\nukedopl3.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\libADLMIDI\include\adlmidi.h" />
+    <ClInclude Include="..\libADLMIDI\include\adlmidi.hpp" />
+    <ClInclude Include="..\libADLMIDI\src\adldata.hh" />
+    <ClInclude Include="..\libADLMIDI\src\adlmidi_mus2mid.h" />
+    <ClInclude Include="..\libADLMIDI\src\adlmidi_private.hpp" />
+    <ClInclude Include="..\libADLMIDI\src\adlmidi_xmi2mid.h" />
+    <ClInclude Include="..\libADLMIDI\src\dbopl.h" />
+    <ClInclude Include="..\libADLMIDI\src\fraction.hpp" />
+    <ClInclude Include="..\libADLMIDI\src\nukedopl3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

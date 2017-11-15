@@ -54,7 +54,7 @@
 #endif
 
 #ifdef HAVE_ADLMIDILIB
-#include "src/adlmidi.h"
+#include "adlmidi.h"
 #endif
 
 extern int audio_buffers;
@@ -463,7 +463,6 @@ static void I_SDLUnRegisterSong(int handle)
 #ifdef HAVE_ADLMIDILIB
    if(adlmidi_player)
    {
-      adlmidi_player->QuitFlag = true;
       Mix_HookMusic(nullptr, nullptr);
       adl_close(adlmidi_player);
       adlmidi_player = nullptr;
@@ -642,8 +641,10 @@ static int I_SDLRegisterSong(void *data, int size)
    if(isMIDI && midi_device == 0)
    {
       adlmidi_player = adl_init(44100);
-      adl_setNumCards(adlmidi_player, adlmidi_numcards);
+      adl_setNumChips(adlmidi_player, adlmidi_numcards);
       adl_setBank(adlmidi_player, adlmidi_bank);
+      // ADLMIDI_FIXME: This
+      adl_setNumFourOpsChn(adlmidi_player, 0);
       if(adl_openData(adlmidi_player, data, long(size)) == 0)
          return 1;
       // Opening data went wrong

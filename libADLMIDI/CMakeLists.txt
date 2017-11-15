@@ -16,6 +16,7 @@ include(CheckCXXCompilerFlag)
 ## Environment Configuration                                                  |
 ##
 
+include_directories (include)
 include_directories (src)
 
 
