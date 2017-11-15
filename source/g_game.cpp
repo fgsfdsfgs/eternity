@@ -153,7 +153,7 @@ bool            mouseSensitivity_vanilla; // [CG] 01/20/12
 int             invert_mouse = false;
 int             invert_padlook = false;
 int             animscreenshot = 0;       // animated screenshots
-int             mouseAccel_type = 0;
+acceltype_e     mouseAccel_type = ACCELTYPE_NONE;
 int             mouseAccel_threshold = 10; // [CG] 01/20/12
 double          mouseAccel_value = 2.0;    // [CG] 01/20/12
 
@@ -457,7 +457,7 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 
    // strafe double click
 
-   if(mouseb_dblc1 >= 0 && mousebuttons[mouseb_dblc1] != dclickstate2 && dclicktime2 > 1 )
+   if(mouseb_dblc1 >= 0 && mousebuttons[mouseb_dblc1] != dclickstate2 && dclicktime2 > 1)
    {
       dclickstate2 = mousebuttons[mouseb_dblc1];
 
@@ -760,9 +760,8 @@ bool G_Responder(event_t* ev)
       if(!walkcam_active) // if so, we need to go on below
       {
          if(gamestate == GS_DEMOSCREEN && !(paused & 2) && 
-            !automapactive &&
-            (ev->type == ev_keydown ||
-             (ev->type == ev_mouse && ev->data1)))
+            !consoleactive && !automapactive &&
+            (ev->type == ev_keydown || (ev->type == ev_mouse && ev->data1)))
          {
             // popup menu
             MN_StartControlPanel();
@@ -1386,7 +1385,10 @@ static void G_WriteDemoTiccmd(ticcmd_t *cmd)
    if(full_demo_version >= make_full_version(340, 23))
       demo_p[i] = cmd->fly;
    
-   if(position + 16 > maxdemosize)   // killough 8/23/98
+   // NOTE: the distance is *double* that of (ticcmd_t + trailer) because on
+   // Release builds, if ticcmd_t becomes larger, just using the simple value
+   // would lock up the program when calling realloc!
+   if(position + 2 * (sizeof(ticcmd_t) + sizeof(uint32_t)) > maxdemosize)   // killough 8/23/98
    {
       // no more space
       maxdemosize += 128*1024;   // add another 128K  -- killough
@@ -2999,7 +3001,7 @@ void G_InitNew(skill_t skill, char *name)
 
    // haleyjd 06/16/04: set g_dir to d_dir if it is valid, or else restore it
    // to the default value.
-   g_dir = d_dir ? d_dir : (inmanageddir = MD_NONE, &wGlobalDir);
+   g_dir = d_dir ? d_dir : (void(inmanageddir = MD_NONE), &wGlobalDir);
    d_dir = NULL;
    
    G_DoLoadLevel();

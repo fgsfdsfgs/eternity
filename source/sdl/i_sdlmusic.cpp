@@ -1,7 +1,7 @@
 // Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
-// Copyright(C) 2013 James Haley, Stephen McGranahan, Julian Aubourg, et al.
+// Copyright(C) 2017 James Haley, Stephen McGranahan, Julian Aubourg, et al.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -195,8 +195,8 @@ static void I_EffectADLMIDI(void *udata, Uint8 *stream, int len)
       memcpy(stream, reinterpret_cast<Uint8 *>(outbuff), size_t(gotlen * ADLMIDISTEP));
    else
    {
-      SDL_MixAudio(stream, reinterpret_cast<Uint8 *>(outbuff), gotlen * ADLMIDISTEP,
-                   (snd_MusicVolume * 128) / 15);
+      SDL_MixAudioFormat(stream, reinterpret_cast<Uint8 *>(outbuff), MIX_DEFAULT_FORMAT,
+                         gotlen * ADLMIDISTEP, (snd_MusicVolume * 128) / 15);
    }
    efree(outbuff);
    adlplaying = false;
@@ -627,7 +627,7 @@ static int I_SDLRegisterSong(void *data, int size)
 
    // Try SDL_mixer locally
    rw    = SDL_RWFromMem(data, size);
-   music = Mix_LoadMUS_RW(rw);
+   music = Mix_LoadMUS_RW(rw, true);
 
 #ifdef HAVE_SPCLIB
    if(!music)
