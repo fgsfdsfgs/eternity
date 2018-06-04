@@ -31,6 +31,7 @@ struct sector_t;
 
 void P_SaveSectorPositions();
 void P_SaveSectorPosition(const sector_t &sec);
+void P_NewSectorActionFromMobj(Mobj *actor);
 void P_SetSectorZoneFromMobj(Mobj *actor);
 
 int EV_SectorSetRotation(const line_t *line, int tag, int floorangle,

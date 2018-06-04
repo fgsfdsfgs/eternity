@@ -30,12 +30,14 @@
 
 #include "doomstat.h"
 #include "e_exdata.h"
+#include "ev_specials.h"
 #include "m_bbox.h"
 #include "p_map.h"
 #include "p_map3d.h"
 #include "p_maputl.h"
 #include "p_portalclip.h"
 #include "p_setup.h"
+#include "p_spec.h"
 #include "polyobj.h"
 #include "r_data.h"
 #include "r_main.h"
@@ -557,6 +559,7 @@ void P_UnsetThingPosition(Mobj *thing)
 //
 void P_SetThingPosition(Mobj *thing)
 {
+   subsector_t *prevss = thing->subsector;
    // link into subsector
    subsector_t *ss = thing->subsector = R_PointInSubsector(thing->x, thing->y);
 
@@ -595,6 +598,14 @@ void P_SetThingPosition(Mobj *thing)
 
       thing->touching_sectorlist = P_CreateSecNodeList(thing, thing->x, thing->y);
       thing->old_sectorlist = NULL;
+
+      // MaxW: EESectorActionEnter and EESectorActionExit
+      if(prevss && prevss->sector != ss->sector)
+      {
+         EV_ActivateSectorAction(ss->sector, thing, SEAC_ENTER);
+         EV_ActivateSectorAction(prevss->sector, thing, SEAC_EXIT);
+      }
+
    }
 
    // link into blockmap

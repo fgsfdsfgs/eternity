@@ -1665,12 +1665,18 @@ void P_SetLineID(line_t *line, int id);
 // haleyjd: parameterized lines
 
 // param special activation types
-enum
+enum specialactivation_e : int
 {
    SPAC_CROSS,
    SPAC_USE,
    SPAC_IMPACT,
    SPAC_PUSH,
+};
+
+enum sectoractivation_e : int
+{
+   SEAC_ENTER,
+   SEAC_EXIT,
 };
 
 extern void P_StartLineScript(line_t *line, int side, Mobj *thing, polyobj_s *po);
