@@ -48,11 +48,13 @@
 #endif
 
 #ifdef LINUX
-   #ifdef __FreeBSD__ // [Kate] Yeeaah...
+   #if defined(__FreeBSD__) // [Kate] Yeeaah...
    #include <limits.h>
    #else
    #include <linux/limits.h>
    #endif
+#elif defined(__SWITCH__)
+   #include <limits.h>
 #endif
 
 #endif

@@ -262,7 +262,7 @@ void C_AddCommandBatch(const char *name, const char *commands)
    else
    {
       command = estructalloc(command_t, 1);
-      command->name = strdup(name);
+      command->name = estrdup(name);
       command->type = ct_command;
       command->flags = 0;
       command->variable = variable;

@@ -299,9 +299,17 @@ bool SDLVideoDriver::InitGraphicsMode()
    // haleyjd 06/19/11: remember characteristics of last successful modeset
    static int fallback_w       = 640;
    static int fallback_h       = 480;
+#if EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
+   static int fallback_w_flags = 0;
+   // SDL_RENDERER_SOFTWARE causes failures in creating renderer
+   static int fallback_r_flags = SDL_RENDERER_TARGETTEXTURE | 
+                                 SDL_RENDERER_ACCELERATED |
+                                 SDL_RENDERER_PRESENTVSYNC;
+#else
    static int fallback_w_flags = SDL_WINDOW_ALLOW_HIGHDPI;
    // SDL_RENDERER_SOFTWARE causes failures in creating renderer
    static int fallback_r_flags = SDL_RENDERER_TARGETTEXTURE;
+#endif
 
    bool wantfullscreen = false;
    bool wantdesktopfs  = false;
@@ -311,9 +319,16 @@ bool SDLVideoDriver::InitGraphicsMode()
    int  v_w            = 640;
    int  v_h            = 480;
    int  v_displaynum   = 0;
+#if EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
+   int  window_flags   = 0;
+   int  renderer_flags = SDL_RENDERER_TARGETTEXTURE |
+                         SDL_RENDERER_ACCELERATED |
+                         SDL_RENDERER_PRESENTVSYNC;
+#else
    int  window_flags   = SDL_WINDOW_ALLOW_HIGHDPI;
    // SDL_RENDERER_SOFTWARE causes failures in creating renderer
    int  renderer_flags = SDL_RENDERER_TARGETTEXTURE;
+#endif
 
    // haleyjd 04/11/03: "vsync" or page-flipping support
    if(use_vsync)
@@ -348,6 +363,20 @@ bool SDLVideoDriver::InitGraphicsMode()
    else
       displaynum = 0;
 
+   printf("InitGraphicsMode(): trying %dx%d\n", v_w, v_h);
+
+#if EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
+   // on the switch our window is always 1080p
+   if(!(window = SDL_CreateWindow("", 0, 0, 1920, 1080, window_flags)))
+   {
+      // SDL_TODO: Trim fat from this error message
+      I_FatalError(I_ERR_KILL,
+                   "I_SDLInitGraphicsMode: couldn't create window for mode %dx%d;\n"
+                   "   SDL reports `%s`;\n"
+                   "   Check your SDL video driver settings.\n",
+                   1920, 1080, SDL_GetError());
+   }
+#else
    if(!(window = SDL_CreateWindow(ee_wmCaption,
                                   SDL_WINDOWPOS_CENTERED_DISPLAY(v_displaynum),
                                   SDL_WINDOWPOS_CENTERED_DISPLAY(v_displaynum),
@@ -372,6 +401,7 @@ bool SDLVideoDriver::InitGraphicsMode()
       v_h          = fallback_h;
       window_flags = fallback_w_flags;
    }
+#endif
 
 #if EE_CURRENT_PLATFORM == EE_PLATFORM_MACOSX
    // this and the below #else block are done here as monitor video mode isn't

@@ -66,6 +66,13 @@ int main(int argc, char **argv)
    myargc = argc;
    myargv = argv;
 
+   // fgsfds 2019/05/01: have to do this as early as possible, otherwise bad
+   // shit happens; shutdown is still in I_Quit
+#if EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
+   socketInitializeDefault();
+   nxlinkStdio();
+#endif
+
    // SDL_FIXME: WASAPI can't currently be enabled, nor can any audio drivers
    //            that doesn't support MIX_DEFAULT_FORMAT.
 #if (EE_CURRENT_PLATFORM == EE_PLATFORM_WINDOWS)

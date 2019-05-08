@@ -903,6 +903,16 @@ void D_SetUserPath()
             source = BASE_HOMEDIR;
       }
    }
+#elif EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
+   // on Switch we use /switch/ as the "home" dir
+   // however if there's nothing there then better use working dir and don't
+   // bother creating anything
+   if(res != BASE_ISGOOD)
+   {
+      userdir = "/switch/eternity/user";
+      if((res = D_CheckUserPath(userdir)) == BASE_ISGOOD)
+         source = BASE_HOMEDIR;
+   }
 #endif
 
    // check exe dir

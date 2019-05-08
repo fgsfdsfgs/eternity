@@ -486,6 +486,30 @@ static void I_Pick_MainLoop(void)
                break;
             }
             break;
+         case SDL_JOYBUTTONDOWN:
+            switch(ev.jbutton.button)
+            {
+            case 11:
+               I_Pick_DoAbort();
+               break;
+            case 1:
+               doloop = false;
+               currentiwad = -1; // erase selection
+               break;
+            case 0:
+            case 10:
+               doloop = false;
+               break;
+            case 14:
+               I_Pick_DoRight();
+               break;
+            case 12:
+               I_Pick_DoLeft();
+               break;
+            default:
+               break;
+            }
+            break;
          default:
             break;
          }
@@ -516,6 +540,16 @@ static void I_Pick_Shutdown(void)
    // the window needs to be destroyed
    if(pickvideoinit)
       SDL_DestroyWindow(pickwindow);
+
+#if EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
+   // vi fucking explodes if we don't do this after the IWAD picker exits
+   if(pickvideoinit)
+   {
+      SDL_QuitSubSystem(SDL_INIT_VIDEO);
+      SDL_Delay(100);
+      SDL_InitSubSystem(SDL_INIT_VIDEO);
+   }
+#endif
 
 //   haleyjd: I hate SDL.
 //   if(pickvideoinit)
@@ -551,9 +585,13 @@ int I_Pick_DoPicker(bool haveIWADs[], int startchoice)
 
    // create the window
    if(!(pickwindow = SDL_CreateWindow(nullptr,
+#if EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
+                                      0, 0, 1280, 720, 0)))
+#else
                                       SDL_WINDOWPOS_CENTERED_DISPLAY(v_displaynum),
                                       SDL_WINDOWPOS_CENTERED_DISPLAY(v_displaynum),
                                       540, 380, 0)))
+#endif
       return -1;
 
    // create the renderer
@@ -600,8 +638,13 @@ int I_Pick_DoPicker(bool haveIWADs[], int startchoice)
    // set window title to currently selected game
    SDL_SetWindowTitle(pickwindow, titles[currentiwad]);
 
+   // need this for gamepad controls, if available
+   SDL_Joystick *joy = SDL_JoystickOpen(0);
+
    // run the program
    I_Pick_MainLoop();
+
+   if (joy) SDL_JoystickClose(joy);
 
    // user is finished, free stuff and get everything back to normal
    I_Pick_Shutdown();

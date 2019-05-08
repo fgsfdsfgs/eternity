@@ -34,6 +34,7 @@ int ee_platform_flags[EE_PLATFORM_MAX] =
    EE_PLATF_CSFS, // Linux
    EE_PLATF_CSFS, // FreeBSD
    0,             // MacOS X
+   EE_PLATF_CSFS, // Switch
    0              // Unknown
 };
 

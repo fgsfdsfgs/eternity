@@ -44,7 +44,8 @@
 //
 #if EE_CURRENT_PLATFORM == EE_PLATFORM_LINUX \
  || EE_CURRENT_PLATFORM == EE_PLATFORM_MACOSX \
- || EE_CURRENT_PLATFORM == EE_PLATFORM_FREEBSD
+ || EE_CURRENT_PLATFORM == EE_PLATFORM_FREEBSD \
+ || EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
 #include <limits.h>
 #elif EE_CURRENT_PLATFORM == EE_PLATFORM_WINDOWS
 #include <windows.h>
@@ -60,7 +61,7 @@
 //
 bool I_CreateDirectory(const qstring &path)
 {
-#if EE_CURRENT_PLATFORM == EE_PLATFORM_LINUX
+#if (EE_CURRENT_PLATFORM == EE_PLATFORM_LINUX) || (EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH)
    if(!mkdir(path.constPtr(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
       return true;
 #endif
@@ -81,6 +82,8 @@ const char *I_PlatformInstallDirectory()
       return "/usr/local/share/eternity/base";
    else
       return "/usr/share/eternity/base";
+#elif EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
+   return "/switch/eternity/base"; // this is our "home dir", the default
 #endif
 
    return nullptr;

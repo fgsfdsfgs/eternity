@@ -194,7 +194,7 @@ endif()
 
 ################################################################################
 ######################### Compiler: Hardening  #################################
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT SWITCH_LIBNX)
    if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
       TRY_C_COMPILER_FLAG(-fstack-protector FLAG_C_fstack_protector)
 
@@ -321,8 +321,12 @@ SET(ACSVM_NOFLAGS ON)
 SET(ACSVM_SHARED OFF)
 ADD_SUBDIRECTORY(acsvm)
 
-ADD_SUBDIRECTORY(zlib)
-ADD_SUBDIRECTORY(libpng)
+IF (NOT SWITCH_LIBNX)
+        # got our own libs for that
+        ADD_SUBDIRECTORY(zlib)
+        ADD_SUBDIRECTORY(libpng)
+ENDIF (NOT SWITCH_LIBNX)
+
 ADD_SUBDIRECTORY(snes_spc)
 ADD_SUBDIRECTORY(source)
 

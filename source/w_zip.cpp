@@ -690,6 +690,12 @@ void ZipLump::setAddress(InBuffer &fin)
    if(!(flags & ZipFile::LF_CALCOFFSET))
       return;
 
+#if EE_CURRENT_PLATFORM == EE_PLATFORM_SWITCH
+   // HACK: the next fseek fails if I don't do this first. why?
+   //       what the fuck, same shit happened in k8vavoom
+   fin.seek(0, SEEK_SET);
+#endif
+
    if(fin.seek(offset, SEEK_SET))
       I_Error("ZipLump::setAddress: could not seek to '%s'\n", name);
 

@@ -33,8 +33,9 @@
 #define EE_PLATFORM_LINUX   1
 #define EE_PLATFORM_FREEBSD 2
 #define EE_PLATFORM_MACOSX  3
-#define EE_PLATFORM_UNKNOWN 4
-#define EE_PLATFORM_MAX     5
+#define EE_PLATFORM_SWITCH  4
+#define EE_PLATFORM_UNKNOWN 5
+#define EE_PLATFORM_MAX     6
 
 #if defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
 #define EE_CURRENT_PLATFORM EE_PLATFORM_WINDOWS
@@ -42,6 +43,9 @@
 #define EE_CURRENT_PLATFORM EE_PLATFORM_FREEBSD
 #elif defined(__MACOSX__) || defined(__APPLE__)
 #define EE_CURRENT_PLATFORM EE_PLATFORM_MACOSX
+#elif defined(__SWITCH__)
+#define EE_CURRENT_PLATFORM EE_PLATFORM_SWITCH
+#include <switch.h>
 #elif defined(LINUX) || defined(__GNUC__)
 // Note guesses Linux if LINUX not defined but compiling with GCC and was not
 // caught by an earlier check above.

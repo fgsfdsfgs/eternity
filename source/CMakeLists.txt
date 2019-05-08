@@ -40,6 +40,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
    add_definitions(-DLINUX)
 endif()
 
+if(SWITCH_LIBNX)
+   add_definitions(-D__SWITCH__)
+   include_directories("$ENV{DEVKITPRO}/libnx/include")
+   include_directories("$ENV{PORTLIBS_PREFIX}/include")
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
    add_definitions(-DEE_FEATURE_REGISTRYSCAN)
 
@@ -105,7 +111,15 @@ FILE (GLOB SDL_SOURCES sdl/*.cpp)
 ADD_EXECUTABLE (eternity ${ARCH_SPECIFIC_SOURCES} ${ETERNITY_SOURCES} ${CONFUSE_SOURCES}
                 ${TEXTSCREEN_SOURCES} ${HAL_SOURCES} ${GL_SOURCES} ${SDL_SOURCES})
 
-target_link_libraries(eternity ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${SDL2_NET_LIBRARY} acsvm png_static snes_spc)
+if(SWITCH_LIBNX)
+   # got our own libpng and libz, also have to link libnx and gles
+   target_link_libraries(eternity ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${SDL2_NET_LIBRARY} mpg123 modplug vorbisfile vorbis ogg EGL glapi drm_nouveau acsvm png snes_spc z nx m)
+   add_custom_command( TARGET eternity POST_BUILD
+      COMMAND aarch64-none-elf-strip -o ${CMAKE_BINARY_DIR}/eternity_stripped.elf ${CMAKE_BINARY_DIR}/source/eternity
+      COMMAND elf2nro ${CMAKE_BINARY_DIR}/eternity_stripped.elf ${CMAKE_BINARY_DIR}/eternity.nro --icon=${CMAKE_SOURCE_DIR}/nx/eternity.jpg --nacp=${CMAKE_SOURCE_DIR}/nx/eternity.nacp )
+else()
+   target_link_libraries(eternity ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${SDL2_NET_LIBRARY} acsvm png_static snes_spc)
+endif()
 
 if(OPENGL_LIBRARY)
    target_link_libraries(eternity ${OPENGL_LIBRARY})

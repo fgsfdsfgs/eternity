@@ -46,7 +46,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef LINUX
+#if defined(LINUX) || defined(__SWITCH__)
 // Linux needs strings.h too, for strcasecmp etc.
 #include <strings.h>
 #endif
